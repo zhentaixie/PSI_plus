@@ -9,7 +9,7 @@ https://github.com/shahakash28/2PC-Circuit-PSI.git
 
 https://github.com/yuchen1024/Kunlun.git
 
-目前隐私相等性测试仍存在报错，后续需要添加不经意传输OT和BatchPIR，
+目前已添加OT，仍在测试，后续需要添加BatchPIR，
 
 不经意传输：需要使用libOTe，对应开源库https://github.com/osu-crypto/libOTe.git
 
