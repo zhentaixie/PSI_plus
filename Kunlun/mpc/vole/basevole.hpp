@@ -343,7 +343,6 @@ namespace VOLE {
 			// calculate <g,temp_vec_v>
 			vec_v[j] = gadget_innerProduct(temp_vec_v);
 		}
-
 	}
 
 

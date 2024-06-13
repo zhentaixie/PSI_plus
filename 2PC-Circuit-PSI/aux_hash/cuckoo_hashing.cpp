@@ -101,6 +101,7 @@ std::vector<uint64_t> CuckooTable::AsRawVector() const {
 
   return raw_table;
 }
+
 #include<tuple>
 std::tuple<std::vector<uint64_t>,std::vector<__m128i>> CuckooTable::AsRawVectorNoID() const {
   std::vector<__m128i> raw_table;

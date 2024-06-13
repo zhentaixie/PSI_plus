@@ -70,7 +70,7 @@ using milliseconds_ratio = std::ratio<1, 1000>;
 using duration_millis = std::chrono::duration<double, milliseconds_ratio>;
 std::vector<uint8_t> perform_block_equality(const std::vector<__m128i> &inputs,
                                             PsiAnalyticsContext &context,
-                                            std::unique_ptr<CSocket> &sock, sci::NetIO *ioArr[2],
+                                            std::unique_ptr<CSocket> &sock, sci::NetIO *ioArr[3],
                                             osuCrypto::Channel &chl) {
   int party = 1;
   if (context.role == 0) {
@@ -85,18 +85,23 @@ std::vector<uint8_t> perform_block_equality(const std::vector<__m128i> &inputs,
 
   otpackArr[0] = new OTPack<NetIO>(ioArr[0], party, b, l);
   otpackArr[1] = new OTPack<NetIO>(ioArr[1], 3 - party, b, l);
+  otpackArr[2] = new OTPack<NetIO>(ioArr[2], party, b, l);
   uint8_t *res_shares;
   res_shares = new uint8_t[num_cmps];
   for (int i = 0; i < num_cmps; i++) {
     res_shares[i] = 1;
   }
-  // for(auto i=0;i<num_cmps;i++)std::cout<<data[i]<<" ";
-  // std::cout<<std::endl;
+  TripleGenerator<NetIO> triple_gen(party, ioArr[2], otpackArr[2]);
+  Triple triple(inputs.size(),true);
+
+  triple_gen.generate(party, &triple, _16KKOT_to_4OT);
+  // // for(auto i=0;i<num_cmps;i++)std::cout<<data[i]<<" ";
+  // // std::cout<<std::endl;
   perform_equality(data, party, 64, 5, num_cmps, context.address, context.port, res_shares, ioArr,
                    otpackArr);
 
-  for(auto i=0;i<num_cmps;i++)if(res_shares[i]==1)std::cout<<"1 ";else std::cout<<"0 ";
-  std::cout<<std::endl;
+  // for(auto i=0;i<num_cmps;i++)if(res_shares[i]==1)std::cout<<"1 ";else std::cout<<"0 ";
+  // std::cout<<std::endl;
   uint8_t **shares = new uint8_t *[2];
   for (size_t i = 0; i < 2; ++i) {
     shares[i] = new uint8_t[inputs.size()];
@@ -105,12 +110,26 @@ std::vector<uint8_t> perform_block_equality(const std::vector<__m128i> &inputs,
     shares[0][i] = res_shares[2 * i];
     shares[1][i] = res_shares[2 * i + 1];
   }
-  TripleGenerator<NetIO> triple_gen(party, ioArr[0], otpackArr[0]);
-  Triple triple(inputs.size()*2,true);
 
-  triple_gen.generate(party, &triple, _16KKOT_to_4OT);
-  auto ei = triple.ai;
-  auto fi = triple.bi;
+  // std::thread cmp_threads[2];
+  // int chunk_size = (num_cmps / (8 * 2)) * 8;
+  // uint8_t* ai=new uint8_t[inputs.size()/8];
+  // uint8_t* bi=new uint8_t[inputs.size()/8];
+  // uint8_t* ci=new uint8_t[inputs.size()/8];
+  uint8_t* ei=new uint8_t[inputs.size()/8];
+  uint8_t* fi=new uint8_t[inputs.size()/8];
+  // for (int i = 0; i < 2; ++i) {
+  //   cmp_threads[i] = std::thread(triple_thread, i,party, 192, l, b,
+  //                                ioArr[i], otpackArr[i],ai,bi,ci);
+  // }
+
+  // for (int i = 0; i < 2; ++i) {
+  //   cmp_threads[i].join();
+  // }
+  for(auto i=0;i<inputs.size()/8;i++){
+    ei[i]=triple.ai[i];
+    fi[i]=triple.bi[i];
+  }
   for (auto i = 0; i < inputs.size(); i += 8) {
     ei[i / 8] ^= sci::bool_to_uint8(&shares[0][i], 8);
     fi[i / 8] ^= sci::bool_to_uint8(&shares[1][i], 8);
@@ -153,8 +172,10 @@ std::vector<uint8_t> perform_block_equality(const std::vector<__m128i> &inputs,
     delete[] shares[i];
   }
   delete[] shares;
-  delete[] e;
-  delete[] f;
+  // delete[] e;
+  delete[] ei;
+  // delete[] e;
+  delete[] fi;
   return ans_shares;
 }
 void run_eq(const std::vector<std::uint64_t> &inputs, PsiAnalyticsContext &context,

@@ -4,7 +4,6 @@
 #include "../../utility/print.hpp"
 #include "../okvs/baxos.hpp"
 #include"../vole/vole.hpp"
-#include <algorithm>
 
 inline std::vector<std::vector<uint8_t>> BlockToV8(std::vector<block> Vec){
         auto size=Vec.size();
@@ -46,7 +45,7 @@ namespace VOLEOPRF
     struct PP
     {
         
-        size_t KEY_SIZE_; // the key size: sizeof(block)*okvs_output_size
+        size_t KEY_SIZE; // the key size: sizeof(block)*okvs_output_size
         size_t RANGE_SIZE; // the range size : sizeof(block)
         size_t STATISTICAL_SECURITY_PARAMETER;
         
@@ -67,18 +66,18 @@ namespace VOLEOPRF
         size_t thread_num;
     };
 
-    PP Setup(size_t INPUT_NUM, size_t STATISTICAL_SECURITY_PARAMETER = 40)
+    PP Setup(size_t LOG_INPUT_NUM, size_t STATISTICAL_SECURITY_PARAMETER = 40)
     {
         PP pp;
         
-        pp.INPUT_NUM = INPUT_NUM; // INPUT_NUM = 2^{LOG_INPUT_NUM}
+        pp.INPUT_NUM = 1ull << LOG_INPUT_NUM; // INPUT_NUM = 2^{LOG_INPUT_NUM}
         pp.STATISTICAL_SECURITY_PARAMETER = STATISTICAL_SECURITY_PARAMETER;
         
-        pp.okvs_bin_size = 1ull << 15;
+        pp.okvs_bin_size = 1ull<<(LOG_INPUT_NUM-7);
         pp.okvs = Baxos<gf_128>(pp.INPUT_NUM, pp.okvs_bin_size, 3, STATISTICAL_SECURITY_PARAMETER);
         pp.okvs_output_size = pp.okvs.bin_num * pp.okvs.total_size;
         
-        pp.KEY_SIZE_ = 16*pp.okvs_output_size;
+        pp.KEY_SIZE = 16*pp.okvs_output_size;
         pp.RANGE_SIZE = 16; // byte length of each item
         
         pp.common_seed = PRG::SetSeed(fixed_seed, 0);
@@ -112,6 +111,7 @@ namespace VOLEOPRF
         PrintSplitLine('-');
         //std::cout << "length of VOLE = " << size << std::endl; 
         A = VOLE::VOLE_A(io, size, C); 
+
 
         // Fig 4.Step 4:send r
         io.SendBlock(seed_r);
@@ -261,8 +261,7 @@ namespace VOLEOPRF
         std::vector<block> C;
         PrintSplitLine('-');
         //std::cout << "length of VOLE = " << size << std::endl; 
-        
-        A = VOLE::VOLE_A(io, size, C,std::min(128ull,1ull<<std::max(0,int(-1+ceil((int)(log2((double)(size)))))))); 
+        A = VOLE::VOLE_A(io, size, C); 
 
 
         // Fig 4.Step 4:send r
@@ -299,6 +298,7 @@ namespace VOLEOPRF
                      
         return output;
     }
+
     std::vector<uint8_t> Server1(NetIO &io, PP &pp)
     {
         PrintSplitLine('-');
@@ -312,10 +312,10 @@ namespace VOLEOPRF
         auto size = pp.okvs_output_size;
 
         // Fig 4.Step 3:VOLE
-        PrintSplitLine('-');
-        std::cout << "length of VOLE = " << size << std::endl; 
+        //PrintSplitLine('-');
+        //std::cout << "length of VOLE = " << size << std::endl; 
         std::vector<block> K;
-        VOLE::VOLE_B(io, size, K,pp.Delta,std::min(128ull,1ull<<std::max(0,int(-1+ceil((int)(log2((double)(size))))))));
+        VOLE::VOLE_B(io, size, K,pp.Delta);
 
 	        
         // Fig 4.Step 4: the sender receives r
@@ -360,7 +360,7 @@ namespace VOLEOPRF
   
         std::vector<block> block_oprf_key = ByteToBlock(oprf_key);
         std::vector<block> output(ITEM_NUM);
-        pp.okvs.decode(vec_Y, output, block_oprf_key, 1);
+        pp.okvs.decode(vec_Y, output, block_oprf_key, 8);
 
         return output;
     }

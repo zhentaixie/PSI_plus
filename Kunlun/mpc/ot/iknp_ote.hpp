@@ -16,7 +16,7 @@ namespace IKNPOTE{
 void CheckParameters(size_t ROW_NUM, size_t COLUMN_NUM)
 {
     if (ROW_NUM%128 != 0 || COLUMN_NUM%128 != 0){
-        std::cerr << "row or column parameters is wrong" << std::endl;
+        std::cerr << "row or column parameters is wrong" <<ROW_NUM<<" "<<COLUMN_NUM<< std::endl;
         exit(EXIT_FAILURE); 
     }
 }

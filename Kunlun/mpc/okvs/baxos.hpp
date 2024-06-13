@@ -603,9 +603,9 @@ void test_baxos_BlockArrayValue()
 
 void test_baxos_block()
 {
-    uint64_t n = 1ull << 20;
+    uint64_t n = (1ull << 24)*3;
     // We observe that when bin_size = n >> 7, the performance seems better than others.
-    uint64_t bin_size = 1 << 13;
+    uint64_t bin_size = 1 << 18;
     PRG::Seed seed = PRG::SetSeed(fixed_seed, 0);
 
     std::vector<block> v = PRG::GenRandomBlocks(seed, n);
@@ -616,7 +616,7 @@ void test_baxos_block()
 
     auto start = std::chrono::steady_clock::now();
     Baxos<gf_128> baxos(n, bin_size, 3);
-    uint8_t thread_num = 4;
+    uint8_t thread_num = 8;
     baxos.solve(k, v, out, 0, thread_num);
     auto end = std::chrono::steady_clock::now();
     std::cout << "encode"

@@ -323,6 +323,23 @@ void equality_thread(int tid, int party, uint64_t* x, uint8_t* z, int lnum_cmps,
   delete compare;
   return;
 }
+void triple_thread(int tid, int party, int lnum_cmps, int l, int b,
+                     sci::NetIO* io, sci::OTPack<sci::NetIO>* otpack,uint8_t*ai,uint8_t*bi,uint8_t*ci) {
+  Equality<NetIO>* compare;
+  if (tid & 1) {
+    compare = new Equality<NetIO>(3 - party, l, b, lnum_cmps, io, otpack);
+  } else {
+    compare = new Equality<NetIO>(party, l, b, lnum_cmps, io, otpack);
+  }
+  compare->generate_triples();
+  for(auto i=0;i<compare->triples_std->num_bytes;i++){
+    ai[i]=compare->triples_std->ai[i];
+    bi[i]=compare->triples_std->bi[i];
+    ci[i]=compare->triples_std->bi[i];
+  }
+  delete compare;
+  return;
+}
 
 void perform_equality(uint64_t* x, int party, int l, int b, int num_cmps, string address, int port,
                       uint8_t* z, sci::NetIO** ioArr, OTPack<sci::NetIO>** otpackArr) {

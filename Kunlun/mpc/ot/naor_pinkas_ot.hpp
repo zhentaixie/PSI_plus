@@ -115,9 +115,9 @@ void Send(NetIO &io, PP &pp, const std::vector<block>& vec_m0, const std::vector
 
 	std::cout <<"Naor-Pinkas OT [step 1]: Sender ===> (C, vec_X) ===> Receiver";
     std::cout << " [" << (double)POINT_BYTE_LEN*(LEN+1)/(1024*1024) << " MB]" << std::endl;
+    std::cout << " [" << LEN << " MB]" << std::endl;
 
 	io.ReceiveECPoints(vec_pk0.data(), LEN); 
-
 	std::vector<ECPoint> vec_K0(LEN); // session key
 	std::vector<ECPoint> vec_K1(LEN); // session key
 	std::vector<block> vec_Y0(LEN);  
@@ -160,10 +160,14 @@ std::vector<block> Receive(NetIO &io, PP &pp, const std::vector<uint8_t> &vec_se
 	std::vector<ECPoint> vec_pk0(LEN);
 	
 	ECPoint C; 	
+    std::cout << LEN << " MB]" << std::endl;
 	io.ReceiveECPoints(&C, 1); 
+    std::cout << LEN << " MB]" << std::endl;
 	io.ReceiveECPoints(vec_X.data(), LEN);
 
+    std::cout << LEN << " MB]" << std::endl;
 	// send pk0[i]
+
 	#pragma omp parallel for num_threads(NUMBER_OF_THREADS)
 	for(auto i = 0; i < LEN; i++) {
 		vec_sk[i] = GenRandomBigIntLessThan(order);

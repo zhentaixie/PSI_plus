@@ -84,8 +84,6 @@ namespace VOLE {
 		if (!vec_leaf.empty()) {
 			vec_leaf.clear();
 		}
-		std::cout<<"****************hello_world1"<<std::endl;
-
 		N_item *= 2;// for EC Code mR=2
 		uint64_t sub_len = N_item / t;
 		uint64_t last_len = N_item % t + N_item / t;
@@ -98,7 +96,6 @@ namespace VOLE {
 		//generate t random blocks vec_k as root for GGM
 		PRG::Seed seed_k = PRG::SetSeed();
 		std::vector<block> vec_k = PRG::GenRandomBlocks(seed_k, t);
-		std::cout<<"****************hello_world2"<<std::endl;
 				
 		// calculate send_to_R, vec_leaf, vec_m0, vec_m1 by FullEval()
 		std::vector<block> vec_m0;
@@ -107,7 +104,6 @@ namespace VOLE {
 		uint8_t temp_level = level; 
 		uint64_t temp_len = sub_len;
 		
-		std::cout<<"****************hello_world3"<<std::endl;
 		
 		// call FullEval t times
 		for (auto i = 0; i < t; i++) {
@@ -116,9 +112,7 @@ namespace VOLE {
 				temp_level = level_last1;
 				temp_len = last_len;
 			}
-
 			vec_sendtoR[i] = FullEval(temp_level, vec_k[i], vec_temp_leaf, vec_m0, vec_m1);
-
 			vec_sendtoR[i] ^= vec_v[i];
 			vec_temp_leaf.resize(temp_len);
 			vec_leaf.insert(vec_leaf.end(), vec_temp_leaf.begin(), vec_temp_leaf.end());
@@ -306,12 +300,10 @@ namespace VOLE {
 		//generate vec_inner
 		std::vector<block> vec_temp; 
 		vec_temp = GGM_PRG(k);
-
 		vec_inner[0] = vec_temp[0];
 		vec_inner[1] = vec_temp[1];
 		auto parent_i = 0;
 		for(auto child_j = 2; child_j < inner_num; child_j+=2){
-
 			vec_temp = GGM_PRG(vec_inner[parent_i]);
 			vec_inner[2*parent_i + 2] = vec_temp[0];
 			vec_inner[2*parent_i + 3] = vec_temp[1];
@@ -342,7 +334,6 @@ namespace VOLE {
 			vec_m0.push_back(temp_m0);
 			vec_m1.push_back(temp_m1); 
 		}
-
 		temp_m0 = vec_leaf[0];
 		temp_m1 = vec_leaf[1];
 		for (auto i = 2; i < leaf_num; i += 2){
