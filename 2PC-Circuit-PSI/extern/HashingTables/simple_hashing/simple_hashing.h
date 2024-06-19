@@ -57,6 +57,7 @@ class SimpleTable : public HashingTable {
   void SetMaximumBinSize(std::size_t size);
 
   std::vector<uint64_t> AsRawVector() const final;
+    std::vector<__m128i> AsRawVectorNoID() const;
   std::vector<uint64_t> AsRawVectorPadded() const;
   std::vector<std::vector<uint64_t>> AsRaw2DVector() const;
   std::tuple<std::vector<std::vector<__m128i>>, size_t> AsRaw2DVectorNoID() const;

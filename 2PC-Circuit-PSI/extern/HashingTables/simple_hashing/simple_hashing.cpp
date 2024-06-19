@@ -86,6 +86,19 @@ std::vector<uint64_t> SimpleTable::AsRawVector() const {
 
   return raw_table;
 }
+std::vector<__m128i> SimpleTable::AsRawVectorNoID() const {
+  std::vector<__m128i> raw_table;
+  raw_table.reserve(elements_.size());
+
+  for (auto i = 0ull; i < num_bins_; ++i) {
+    for (auto j = 0ull; j < hash_table_.at(i).size(); ++j) {
+      raw_table.push_back(_mm_set_epi64x(static_cast<uint64_t>(hash_table_.at(i).at(j).GetCurrentFunctinId()),
+          hash_table_.at(i).at(j).GetElement() ));
+    }
+  }
+
+  return raw_table;
+}
 
 std::vector<std::vector<uint64_t>> SimpleTable::AsRaw2DVector() const {
   std::vector<std::vector<uint64_t>> raw_table(num_bins_);
