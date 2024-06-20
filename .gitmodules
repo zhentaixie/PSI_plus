@@ -1,0 +1,6 @@
+[submodule "extern/2PC-Circuit-PSI"]
+	path = extern/2PC-Circuit-PSI
+	url = https://github.com/shahakash28/2PC-Circuit-PSI.git
+[submodule "extern/Kunlun"]
+	path = extern/Kunlun
+	url = https://github.com/yuchen1024/Kunlun.git
