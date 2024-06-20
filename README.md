@@ -3,7 +3,7 @@ Experimental Test Code for Circuit PSI
 
 本仓库为论文【["Unbalanced Circuit-PSI from Oblivious Key-Value Retrieval"](https://eprint.iacr.org/2023/1636)】的测试性c++代码，目前未完成，仅做备份参考用。论文原作者对应可用源代码请参考：https://github.com/alibaba-edu/mpc4j.git 。
 
-目前包含两份开源代码，测试本仓库前事先完成两份开源代码的编译。本仓库对2Pc-Cuircuit-PSI中隐私相等性测试做出扩展，对Kunlun中的vole_oprf进行修改，修改后的执行文件为./2PC-Circuit-PSI/src/circuit_psi.cpp。
+目前包含两份开源代码，测试本仓库前事先完成两份开源代码的编译。按照Kunlun库中的说明进行编译，后续编译过程可使用setup.sh进行辅助。本仓库对2Pc-Cuircuit-PSI中隐私相等性测试做出扩展，修改后的执行文件为./2PC-Circuit-PSI/src/circuit_psi.cpp。
 
 https://github.com/shahakash28/2PC-Circuit-PSI.git
 
